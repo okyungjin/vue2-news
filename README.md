@@ -22,3 +22,10 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+# Router 설정
+## vue-router 설치
+```
+npm i vue-router@3.5.3 --save
+```
