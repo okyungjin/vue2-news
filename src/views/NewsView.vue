@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="news in newsList" :key="news.id">{{ news.title }}</div>
+    <div v-for="aNews in news" :key="aNews.id">{{ aNews.title }}</div>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
     this.$store.dispatch('FETCH_NEWS');
   },
   computed: {
-    ...mapState(['newsList']),
+    ...mapState(['news']),
   },
 };
 </script>

@@ -5,18 +5,14 @@
 </template>
 
 <script>
-import { fetchAsksList } from '../api/index';
+import { mapState } from 'vuex';
 
 export default {
   created() {
-    fetchAsksList()
-      .then((res) => { this.asks = res.data; })
-      .catch((err) => throw new Error(err));
+    this.$store.dispatch('FETCH_ASKS');
   },
-  data() {
-    return {
-      asks: [],
-    };
+  computed: {
+    ...mapState(['asks']),
   },
 };
 </script>

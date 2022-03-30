@@ -5,18 +5,14 @@
 </template>
 
 <script>
-import { fetchJobsList } from '../api/index';
+import { mapState } from 'vuex';
 
 export default {
   created() {
-    fetchJobsList()
-      .then((res) => { this.jobs = res.data; })
-      .catch((err) => throw new Error(err));
+    this.$store.dispatch('FETCH_JOBS');
   },
-  data() {
-    return {
-      jobs: [],
-    };
+  computed: {
+    ...mapState(['jobs']),
   },
 };
 </script>
