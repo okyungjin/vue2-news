@@ -1,6 +1,24 @@
-# vue2-news
+# Table of Contents
+- [Table of Contents](#table-of-contents)
+- [About Project](#about-project)
+- [Project setup](#project-setup)
+    - [Compiles and hot-reloads for development](#compiles-and-hot-reloads-for-development)
+    - [Compiles and minifies for production](#compiles-and-minifies-for-production)
+    - [Lints and fixes files](#lints-and-fixes-files)
+  - [ESLint 설정](#eslint-설정)
+- [DEV](#dev)
+  - [Router 설정](#router-설정)
+    - [vue-router 설치](#vue-router-설치)
+- [Troubleshooting](#troubleshooting)
+  - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
+    - [오류](#오류)
+    - [해결 방법](#해결-방법)
 
-## Project setup
+<br>
+
+# About Project
+
+# Project setup
 ```
 npm install
 ```
@@ -20,14 +38,14 @@ npm run build
 npm run lint
 ```
 
-# ESLint 설정
+## ESLint 설정
 ```
 # vue-cli로 eslint 설정
 vue add eslint
 ```
-
-# Router 설정
-## vue-router 설치
+# DEV
+## Router 설정
+### vue-router 설치
 ```
 npm i vue-router@3.5.3 --save
 ```
@@ -36,7 +54,7 @@ npm i vue-router@3.5.3 --save
 ## throw 사용 시 오류 발생
 ### 오류
 `throw new Error` 사용 시 babel에서 다음과 같은 오류가 발생한다.
-```
+```bash
  ERROR  Failed to compile with 1 error                                                                             오전 9:04:19
 
  error  in ./src/views/NewsView.vue?vue&type=script&lang=js&
@@ -62,18 +80,18 @@ If you want to leave it as-is, add @babel/plugin-syntax-throw-expressions (https
 ```
 ### 해결 방법
 1. `@babel/plugin-proposal-throw-expressions` npm install
-    ```
-    npm i -D @babel/plugin-proposal-throw-expressions
-    ```
-2. `babel.config.js`에 `plugins` 추가
-    ```diff
-    module.exports = {
-      presets: [
-        '@vue/cli-plugin-babel/preset',
-      ],
-    + plugins: [
-    +    '@babel/plugin-proposal-throw-expressions',
-    +  ],
-    };
-3. `npm run serve` 재실행
 ```
+npm i -D @babel/plugin-proposal-throw-expressions
+```
+2. `babel.config.js`에 `plugins` 추가
+```diff
+module.exports = {
+  presets: [
+    '@vue/cli-plugin-babel/preset',
+  ],
++ plugins: [
++    '@babel/plugin-proposal-throw-expressions',
++  ],
+};
+```
+3. `npm run serve` 재실행
