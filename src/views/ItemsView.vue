@@ -7,7 +7,3 @@ export default {
   name: 'ItemsView',
 };
 </script>
-
-<style scoped>
-
-</style>
