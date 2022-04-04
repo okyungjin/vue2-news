@@ -5,7 +5,10 @@ import {
 export default {
   FETCH_NEWS({ commit }) {
     fetchNewsList()
-      .then(({ data }) => { commit('SET_NEWS', data); })
+      .then(({ data }) => {
+        commit('SET_NEWS', data);
+        return data; // TODO: Promise로 변경
+      })
       .catch((err) => throw new Error(err));
   },
   FETCH_JOBS({ commit }) {

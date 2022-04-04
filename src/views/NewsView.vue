@@ -6,10 +6,21 @@
 
 <script>
 import ListItem from '../components/ListItem.vue';
+import bus from '../utils/bus';
 
 export default {
   components: {
     ListItem,
+  },
+  created() {
+    bus.$emit('start:spinner');
+    this.$store.dispatch('FETCH_NEWS')
+      .then(() => {
+        bus.$emit('end:spinner');
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   },
 };
 </script>
