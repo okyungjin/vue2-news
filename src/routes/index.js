@@ -3,8 +3,8 @@ import Vue from 'vue';
 import NewsView from '../views/NewsView.vue';
 import AskView from '../views/AskView.vue';
 import JobsView from '../views/JobsView.vue';
-import ItemsView from '../views/ItemsView.vue';
-import UsersView from '../views/UsersView.vue';
+import ItemView from '../views/ItemView.vue';
+import UserView from '../views/UserView.vue';
 
 Vue.use(VueRouter);
 
@@ -32,11 +32,11 @@ export default new VueRouter({
     },
     {
       path: '/items/:id',
-      component: ItemsView,
+      component: ItemView,
     },
     {
       path: '/users/:id',
-      component: UsersView,
+      component: UserView,
     },
   ],
 });

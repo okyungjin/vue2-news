@@ -11,7 +11,7 @@
               <a :href="item.url">{{ item.title }}</a>
             </template>
             <template v-else>
-              <router-link :to="`item/${item.id}`">
+              <router-link :to="`items/${item.id}`">
                 {{ item.title }}
               </router-link>
             </template>
