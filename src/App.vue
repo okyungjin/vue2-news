@@ -11,7 +11,7 @@
 <script>
 import ToolBar from './components/ToolBar.vue';
 import Spinner from './components/Spinner.vue';
-import bus from './utils/bus';
+import { bus } from './utils/bus';
 
 export default {
   components: { Spinner, ToolBar },

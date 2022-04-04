@@ -1,24 +1,13 @@
 import {
-  fetchAsksList, fetchJobsList, fetchNewsList, fetchUser, fetchItem,
+  fetchList, fetchUser, fetchItem,
 } from '../api';
 
 export default {
-  FETCH_NEWS({ commit }) {
-    fetchNewsList()
+  FETCH_LIST({ commit }, routeName) {
+    fetchList(routeName)
       .then(({ data }) => {
-        commit('SET_NEWS', data);
-        return data; // TODO: Promise로 변경
+        commit('SET_LIST', data);
       })
-      .catch((err) => throw new Error(err));
-  },
-  FETCH_JOBS({ commit }) {
-    fetchJobsList()
-      .then(({ data }) => { commit('SET_JOBS', data); })
-      .catch((err) => throw new Error(err));
-  },
-  FETCH_ASKS({ commit }) {
-    fetchAsksList()
-      .then(({ data }) => { commit('SET_ASKS', data); })
       .catch((err) => throw new Error(err));
   },
   FETCH_USER({ commit }, userName) {
