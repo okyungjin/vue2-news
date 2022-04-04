@@ -2,8 +2,9 @@
   <div>
     <section>
       <UserProfile :user-info="itemInfo">
-        <div slot="userName">{{ itemInfo.user }}</div>
-        <template slot="time">{{ itemInfo.time_ago }}</template>
+        <router-link slot="userName" :to="`/users/${itemInfo.user}`">
+          {{ itemInfo.user }}
+        </router-link>
       </UserProfile>
     </section>
     <section>
