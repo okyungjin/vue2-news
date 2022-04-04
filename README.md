@@ -6,13 +6,25 @@
     - [Compiles and minifies for production](#compiles-and-minifies-for-production)
     - [Lints and fixes files](#lints-and-fixes-files)
   - [ESLint 설정](#eslint-설정)
-- [DEV](#dev)
+- [DEV Notes](#dev-notes)
   - [Router 설정](#router-설정)
     - [vue-router 설치](#vue-router-설치)
   - [Arrow function과 this](#arrow-function과-this)
     - [Arrow function 사용](#arrow-function-사용)
     - [Arrow Function 미사용](#arrow-function-미사용)
   - [Promise](#promise)
+  - [export와 export default](#export와-export-default)
+    - [export](#export)
+    - [export default](#export-default)
+  - [이벤트 버스(Event Bus)로 Spinner 제어하기](#이벤트-버스event-bus로-spinner-제어하기)
+    - [1) Event Bus 생성](#1-event-bus-생성)
+    - [2) Event Bus 등록](#2-event-bus-등록)
+    - [3) View에서 Event 발생시키기](#3-view에서-event-발생시키기)
+  - [하이 오더 컴포넌트 (HOC, Higher-Order Components)](#하이-오더-컴포넌트-hoc-higher-order-components)
+    - [1) ListView 생성](#1-listview-생성)
+    - [2) createListView 함수 생성](#2-createlistview-함수-생성)
+    - [3) routes의 components 변경](#3-routes의-components-변경)
+    - [4) HOC 적용 확인](#4-hoc-적용-확인)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
@@ -60,7 +72,8 @@ npm run lint
 vue add eslint
 ```
 
-# DEV
+# DEV Notes
+개발하면서 얻은 지식들을 메모합니다.
 ## Router 설정
 ### vue-router 설치
 ```
@@ -120,6 +133,159 @@ function fetchData() {
     .then((res) => console.log(res)); // Promise는 chaining이 가능하다.
 }
 ```
+
+## export와 export default
+### export
+```js
+export const bus = new Vue();
+
+import { bus } from '/bus.js';
+```
+### export default
+```js
+export default new Vue();
+
+import bus from '/bus.js'; // 이름은 마음대로 변경 가능
+```
+## 이벤트 버스(Event Bus)로 Spinner 제어하기
+Spinner 같은 컴포넌트는 `이벤트 버스` 로 제어하면 편리하다.
+### 1) Event Bus 생성
+`src/utils/bus.js`
+```js
+import Vue from 'vue';
+
+export default new Vue();
+```
+
+### 2) Event Bus 등록
+`created()` 에서 event bus를 등록하고, `beforeDestroy()`에서 event bus를 해제시킨다.
+> event bus 사용 시에는 off 하는 것을 잊지 말자.
+```html
+
+<template>
+  <div>
+    <!-- Spinner 외 생략 -->
+    <Spinner :loading="loadingStatus"></Spinner>
+  </div>
+  
+</template>
+
+<script>
+import bus from './utils/bus';
+
+export default {
+  data() {
+    return {
+      loadingStatus: false,
+    };
+  },
+  methods: {
+    startSpinner() {
+      this.loadingStatus = true;
+    },
+    endSpinner() {
+      this.loadingStatus = false;
+    },
+  },
+  created() {
+    bus.$on('start:spinner', this.startSpinner);
+    bus.$on('end:spinner', this.endSpinner);
+  },
+  beforeDestroy() { // ** 반드시 off를 해준다 **
+    bus.$off('start:spinner', this.startSpinner);
+    bus.$off('end:spinner', this.endSpinner);
+  },
+  // 이하 생략 ...
+};
+</script>
+```
+### 3) View에서 Event 발생시키기
+`bus.$emit` 메서드로 spinner를 실행 / 중지시킨다.
+아래 코드는 컴포넌트가 생성될 때 스피너를 시작했다가, 데이터가 도착하면 중지하는 에제이다.
+```js
+created() {
+  bus.$emit('start:spinner'); // START
+  this.$store.dispatch('FETCH_NEWS')
+    .then(() => {
+      bus.$emit('end:spinner'); // END
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+},
+```
+## 하이 오더 컴포넌트 (HOC, Higher-Order Components)
+컴포넌트의 로직을 재사용할 수 있는 HOC에 대해서 알아보자.
+[참고문서) React의 Higher-Order Components](https://reactjs.org/docs/higher-order-components.html)
+### 1) ListView 생성
+`createListView.js`의 `render` 함수에 연결해줄 컴포넌트를 하나 생성한다.
+```html
+<!-- views/ListView.vue -->
+<template>
+  <ListItem></ListItem>
+</template>
+
+<script>
+import ListItem from '../components/ListItem.vue';
+
+export default {
+  components: { ListItem },
+};
+</script>
+```
+### 2) createListView 함수 생성
+히이 오더 컴포넌트를 렌더링할 수 있도록 하는 `createListView`를 생성한다.
+```js
+// createListView.js
+import ListView from './ListView.vue';
+import { bus } from '../utils/bus';
+
+export default (routeName) => ({
+  name: routeName,
+  created() {
+    bus.$emit('start:spinner');
+    this.$store.dispatch('FETCH_LIST', this.$route.name)
+      .then(() => bus.$emit('end:spinner'))
+      .catch((error) => throw new Error(error));
+  },
+  render(createElement) {
+    return createElement(ListView); // 1에서 생성한 ListView 바인딩
+  },
+});
+```
+
+### 3) routes의 components 변경
+`routes`의 `components`에서 `createListView`를 호출하도록 변경한다.
+```js
+// routes/index.js
+routes: [
+  {
+    path: '/news',
+    name: 'news',
+    component: createListView('NewsView'),
+  },
+  {
+    path: '/ask',
+    name: 'ask',
+    component: createListView('AskView'),
+  },
+  {
+    path: '/jobs',
+    name: 'jobs',
+    component: createListView('JobsView'),
+  },
+]
+```
+### 4) HOC 적용 확인
+**NewsView**
+<img src="https://user-images.githubusercontent.com/31913666/161512412-3031760b-bb9f-46a5-af11-24f9a178b5b0.png" width="300"/>
+
+**JobsView**
+<img src="https://user-images.githubusercontent.com/31913666/161512427-bf2e92fd-6f00-4ebb-a0a3-3c34241a285a.png" width="300"/>
+
+**AskView**
+<img src="https://user-images.githubusercontent.com/31913666/161512431-907c2306-7ca2-4ada-a0a4-48228d5212b5.png" width="300"/>
+
 
 # Troubleshooting
 ## throw 사용 시 오류 발생
