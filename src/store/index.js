@@ -6,11 +6,20 @@ import actions from './actions';
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
-  store: {
+  state: {
     news: [],
     jobs: [],
     asks: [],
-    userInfo: null,
+    userInfo: {},
+    itemInfo: [],
+  },
+  getters: {
+    fetchedAsk(state) {
+      return state.ask;
+    },
+    fetchedItem(state) {
+      return state.item;
+    },
   },
   mutations,
   actions,

@@ -1,7 +1,7 @@
 <template>
   <div>
     <p v-for="job in jobs" :key="job.id">
-      <a :href="job.url">{{ job.title }}</a>
+      <router-link :to="job.url">{{ job.title }}</router-link>
       <small>{{ job.time_age }} {{ job.domain }}</small>
     </p>
   </div>

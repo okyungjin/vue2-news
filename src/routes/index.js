@@ -28,7 +28,7 @@ export default new VueRouter({
       component: JobsView,
     },
     {
-      path: '/items',
+      path: '/items/:id',
       component: ItemsView,
     },
     {

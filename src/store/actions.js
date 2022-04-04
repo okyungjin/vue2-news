@@ -1,27 +1,34 @@
 import {
-  fetchAsksList, fetchJobsList, fetchNewsList, fetchUser,
+  fetchAsksList, fetchJobsList, fetchNewsList, fetchUser, fetchItem,
 } from '../api';
 
 export default {
-  FETCH_NEWS(context) {
+  FETCH_NEWS({ commit }) {
     fetchNewsList()
-      .then(({ data }) => { context.commit('SET_NEWS', data); })
+      .then(({ data }) => { commit('SET_NEWS', data); })
       .catch((err) => throw new Error(err));
   },
-  FETCH_JOBS(context) {
+  FETCH_JOBS({ commit }) {
     fetchJobsList()
-      .then(({ data }) => { context.commit('SET_JOBS', data); })
+      .then(({ data }) => { commit('SET_JOBS', data); })
       .catch((err) => throw new Error(err));
   },
-  FETCH_ASKS(context) {
+  FETCH_ASKS({ commit }) {
     fetchAsksList()
-      .then(({ data }) => { context.commit('SET_ASKS', data); })
+      .then(({ data }) => { commit('SET_ASKS', data); })
       .catch((err) => throw new Error(err));
   },
-  FETCH_USER(context, userName) {
+  FETCH_USER({ commit }, userName) {
     fetchUser(userName)
       .then(({ data }) => {
-        context.commit('SET_USER', data);
+        commit('SET_USER', data);
+      })
+      .catch((err) => throw new Error(err));
+  },
+  FETCH_ITEM({ commit }, itemId) {
+    fetchItem(itemId)
+      .then(({ data }) => {
+        commit('SET_ITEM', data);
       })
       .catch((err) => throw new Error(err));
   },
