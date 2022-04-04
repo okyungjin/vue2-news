@@ -5,6 +5,7 @@
         <router-link slot="userName" :to="`/users/${itemInfo.user}`">
           {{ itemInfo.user }}
         </router-link>
+        <span slot="time">{{ 'Posted ' + itemInfo.time_ago }}</span>
       </UserProfile>
     </section>
     <section>
