@@ -25,6 +25,9 @@
     - [2) createListView 함수 생성](#2-createlistview-함수-생성)
     - [3) routes의 components 변경](#3-routes의-components-변경)
     - [4) HOC 적용 확인](#4-hoc-적용-확인)
+      - [NewsView](#newsview)
+      - [JobsView](#jobsview)
+      - [AskView](#askview)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
@@ -277,13 +280,13 @@ routes: [
 ]
 ```
 ### 4) HOC 적용 확인
-**NewsView**
+#### NewsView
 <img src="https://user-images.githubusercontent.com/31913666/161512412-3031760b-bb9f-46a5-af11-24f9a178b5b0.png" width="300"/>
 
-**JobsView**
+#### JobsView
 <img src="https://user-images.githubusercontent.com/31913666/161512427-bf2e92fd-6f00-4ebb-a0a3-3c34241a285a.png" width="300"/>
 
-**AskView**
+#### AskView
 <img src="https://user-images.githubusercontent.com/31913666/161512431-907c2306-7ca2-4ada-a0a4-48228d5212b5.png" width="300"/>
 
 
