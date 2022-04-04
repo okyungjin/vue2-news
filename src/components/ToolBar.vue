@@ -20,7 +20,7 @@ export default {
   padding: 8px;
 }
 .header .router-link-exact-active {
-  color: red;
+  color: #828282;
 }
 .header a {
   color: white;
