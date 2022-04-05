@@ -44,6 +44,7 @@
     - [Promise](#promise-1)
     - [async / await](#async--await-1)
   - [Error Handling](#error-handling)
+  - [Vue에서 DOM에 접근하기 (ref 속성 사용)](#vue에서-dom에-접근하기-ref-속성-사용)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
@@ -526,6 +527,30 @@ async FETCH_USER({ commit }, userName) {
   return response;
 }
 ```
+## Vue에서 DOM에 접근하기 (ref 속성 사용)
+
+`ref` 속성을 사용하여 DOM에 접근할 수 있다.
+
+**컴포넌트 단위로 존재하기 때문에 전역 tag로 접근하는  `getElementById`와 `querySelector` 보다는 `ref`를 사용하는 것이 좋다.**
+
+```html
+<html>
+<head>
+
+</head>
+<body>
+  <div ref="app" id="app">hello</div>
+  <script>
+    // divElement 1 ~ 4는 같다
+    const divElement1 = document.getElementById('app');
+    const divElement2 = document.querySelector('#app');
+    const divElement3 = $('#app'); // jquery
+    const divElement4 = this.$refs.app; 
+  </script>
+</body>
+</html>
+```
+
 
 # Troubleshooting
 ## throw 사용 시 오류 발생
