@@ -3,25 +3,19 @@ import {
 } from '../api';
 
 export default {
-  FETCH_LIST({ commit }, routeName) {
-    return fetchList(routeName)
-      .then(({ data }) => {
-        commit('SET_LIST', data);
-      })
-      .catch((err) => throw new Error(err));
+  async FETCH_LIST({ commit }, routeName) {
+    const response = await fetchList(routeName);
+    commit('SET_LIST', response.data);
+    return response;
   },
-  FETCH_USER({ commit }, userName) {
-    return fetchUser(userName)
-      .then(({ data }) => {
-        commit('SET_USER', data);
-      })
-      .catch((err) => throw new Error(err));
+  async FETCH_USER({ commit }, userName) {
+    const response = await fetchUser(userName);
+    commit('SET_USER', response.data);
+    return response;
   },
-  FETCH_ITEM({ commit }, itemId) {
-    return fetchItem(itemId)
-      .then(({ data }) => {
-        commit('SET_ITEM', data);
-      })
-      .catch((err) => throw new Error(err));
+  async FETCH_ITEM({ commit }, itemId) {
+    const response = await fetchItem(itemId);
+    commit('SET_ITEM', response.data);
+    return response;
   },
 };
