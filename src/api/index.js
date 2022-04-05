@@ -1,14 +1,36 @@
 import axios from 'axios';
+import { handleException } from '../utils/handler';
 
 const config = {
   baseUrl: 'https://api.hnpwa.com/v0',
 };
 
-const fetchList = (name) => axios.get(`${config.baseUrl}/${name}/1.json`);
+const fetchList = async (name) => {
+  try {
+    return await axios.get(`${config.baseUrl}/${name}/1.json`);
+  } catch (error) {
+    handleException(error);
+    return error;
+  }
+};
 
-const fetchUser = (userName) => axios.get(`${config.baseUrl}/user/${userName}.json`);
+const fetchUser = async (userName) => {
+  try {
+    return await axios.get(`${config.baseUrl}/user/${userName}.json`);
+  } catch (error) {
+    handleException(error);
+    return error;
+  }
+};
 
-const fetchItem = (itemId) => axios.get(`${config.baseUrl}/item/${itemId}.json`);
+const fetchItem = async (itemId) => {
+  try {
+    return await axios.get(`${config.baseUrl}/item/${itemId}.json`);
+  } catch (error) {
+    handleException(error);
+    return error;
+  }
+};
 
 export {
   fetchList,
