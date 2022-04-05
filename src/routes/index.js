@@ -3,6 +3,11 @@ import Vue from 'vue';
 import ItemView from '../views/ItemView.vue';
 import UserView from '../views/UserView.vue';
 import createListView from '../views/createListView';
+import NewsView from '../views/NewsView.vue';
+import JobsView from '../views/JobsView.vue';
+import { START_SPINNER } from '../utils/spinner';
+import { bus } from '../utils/bus';
+import { store } from '../store';
 
 Vue.use(VueRouter);
 
@@ -11,24 +16,40 @@ export default new VueRouter({
   routes: [
     {
       path: '/',
-      component: () => import('../views/NewsView.vue'),
-      // component: createListView('NewsView'),
+      component: NewsView,
     },
     {
       path: '/news',
       name: 'news',
-      component: () => import('../views/NewsView.vue'),
-      // component: createListView('NewsView'),
+      component: NewsView,
+      beforeEnter: (to, _, next) => {
+        bus.$emit(START_SPINNER);
+        store.dispatch('FETCH_LIST', to.name)
+          .then(() => next())
+          .catch((error) => throw new Error(error));
+      },
     },
     {
       path: '/ask',
       name: 'ask',
       component: createListView('AskView'), // HOC
+      beforeEnter: (to, _, next) => {
+        bus.$emit(START_SPINNER);
+        store.dispatch('FETCH_LIST', to.name)
+          .then(() => next())
+          .catch((error) => throw new Error(error));
+      },
     },
     {
       path: '/jobs',
       name: 'jobs',
-      component: () => import('../views/JobsView.vue'),
+      component: JobsView,
+      beforeEnter: (to, _, next) => {
+        bus.$emit(START_SPINNER);
+        store.dispatch('FETCH_LIST', to.name)
+          .then(() => next())
+          .catch((error) => throw new Error(error));
+      },
     },
     {
       path: '/items/:id',

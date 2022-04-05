@@ -6,12 +6,12 @@
 
 <script>
 import ListItem from '../components/ListItem.vue';
-import ListMixin from '../mixins/ListMixin';
+import { spinnerMixin } from '../mixins/spinnerMixin';
 
 export default {
   components: {
     ListItem,
   },
-  mixins: [ListMixin],
+  mixins: [spinnerMixin],
 };
 </script>
