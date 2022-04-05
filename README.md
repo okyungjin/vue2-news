@@ -28,6 +28,10 @@
       - [NewsView](#newsview)
       - [JobsView](#jobsview)
       - [AskView](#askview)
+  - [Mixin](#mixin)
+  - [Router 네비게이션 가드](#router-네비게이션-가드)
+    - [데이터 호출 시점](#데이터-호출-시점)
+    - [beforeEnter](#beforeenter)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
@@ -288,6 +292,82 @@ routes: [
 
 #### AskView
 <img src="https://user-images.githubusercontent.com/31913666/161512431-907c2306-7ca2-4ada-a0a4-48228d5212b5.png" width="300"/>
+
+## Mixin
+HOC와 비슷하게 Mixin도 컴포넌트 내부의 로직을 재사용 가능하게 해준다.
+
+`src` 디렉토리 하위에 `mixins` 디렉토리를 생성한 후 Mixin을 작성한다.
+아래 소스는 spinner에 대한 mixin이다.
+```js
+import { END_SPINNER } from '../utils/spinner';
+import { bus } from '../utils/bus';
+
+export const spinnerMixin = {
+  // created() {}
+  // data() {}
+  mounted() {
+    bus.$emit(END_SPINNER);
+  },
+};
+```
+Vue 컴포넌트가 `mounted` 일 때 `bus.$emit(END_SPINNER)`를 실행해주는 모든 컴포넌트에 반복적이다.
+이럴 경우 Mixin을 사용하여 코드의 중복을 줄여줄 수 있다.
+
+vue 파일에서 다음과 같이 mixin을 불러온다.
+```html
+<template>
+  생략
+</template>
+
+<script>
+import ListItem from '../components/ListItem.vue';
+import { spinnerMixin } from '../mixins/spinnerMixin';
+
+export default {
+  components: {
+    ListItem,
+  },
+  mixins: [spinnerMixin], // Mixin 사용
+};
+</script>
+```
+실행해보면 mounted hook에서 spinner가 제거되는 것을 확인할 수 있다.
+
+## Router 네비게이션 가드
+### 데이터 호출 시점
+데이터 호출 시점은 2가지로 나눌 수 있다.
+이번에는 라우터 네비게이션 가드에 대해서 알아보겠다.
+
+1. 라우터 네비게이션 가드
+   - 특정 URL로 접근하기 전의 동작을 정의하는 속성(함수)
+   - [네비게이션 가드 블로그 글](https://joshua1988.github.io/web-development/vuejs/vue-router-navigation-guards/)
+   - [Vue Router 공식 문서 - Navigation Guards](https://router.vuejs.org/guide/advanced/navigation-guards.html#navigation-guards) 
+2. 컴포넌트 라이프 사이클
+   - created: 컴포넌트가 생성되자마자 호출되는 로직
+
+### beforeEnter
+`beforeEnter` 속성을 사용하면 라우트가 변경될 때 특정 로직이 실행되도록 설정할 수 있다.
+예를 들어, 권한이 없으면 로그인 페이지로 이동하게 하는 등의 로직 구현이 `beforeEnter` 에서 이루어진다.
+
+아래 소스는 라우트가 변경될 때 Spinner를 발생시키는 예시이다.
+**`next()` 메서드를 반드시 호출해야 하며, 미호출시 라우트가 전환되지 않는다.**
+```js
+routes: [
+  // 생략
+  {
+    path: '/news',
+    name: 'news',
+    component: NewsView,
+    beforeEnter: (to, _, next) => {
+      bus.$emit(START_SPINNER);
+      store.dispatch('FETCH_LIST', to.name)
+        .then(() => next())
+        .catch((error) => throw new Error(error));
+    },
+  },
+  // 생략
+]
+```
 
 
 # Troubleshooting
