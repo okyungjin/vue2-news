@@ -12,7 +12,6 @@
   - [Arrow function과 this](#arrow-function과-this)
     - [Arrow function 사용](#arrow-function-사용)
     - [Arrow Function 미사용](#arrow-function-미사용)
-  - [Promise](#promise)
   - [export와 export default](#export와-export-default)
     - [export](#export)
     - [export default](#export-default)
@@ -32,6 +31,19 @@
   - [Router 네비게이션 가드](#router-네비게이션-가드)
     - [데이터 호출 시점](#데이터-호출-시점)
     - [beforeEnter](#beforeenter)
+  - [JavaScript 비동기 처리 패턴](#javascript-비동기-처리-패턴)
+    - [Callback](#callback)
+    - [Promise](#promise)
+      - [example 1](#example-1)
+      - [example 2](#example-2)
+    - [async / await](#async--await)
+      - [기본 문법](#기본-문법)
+      - [example](#example)
+      - [await 에러 핸들링](#await-에러-핸들링)
+  - [async / await store에 적용하기](#async--await-store에-적용하기)
+    - [Promise](#promise-1)
+    - [async / await](#async--await-1)
+  - [Error Handling](#error-handling)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
@@ -118,28 +130,6 @@ fetchNewsList()
   .catch((err) => throw new Error(err));
 ```
 ![Arrow Function 미사용](https://user-images.githubusercontent.com/31913666/160735425-64682834-8c37-4a21-8d19-a72fea84e43a.png)
-
-## Promise
-JavaScript에서 비동기를 처리하는데 필요한 개념 Promise
-```js
-function callAjax() {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      url: 'https://api.hnpwa.com/v0/news/1.json',
-      success: function(data) {
-        resolve(data);
-      },
-    });
-  });
-}
-
-function fetchData() {
-  var result = [];
-  callAjax()
-    .then((res) => console.log(res));
-    .then((res) => console.log(res)); // Promise는 chaining이 가능하다.
-}
-```
 
 ## export와 export default
 ### export
@@ -369,6 +359,173 @@ routes: [
 ]
 ```
 
+## JavaScript 비동기 처리 패턴
+### Callback
+```js
+$.get('domain.com/id', function(id) {
+  if (id == 'John') {
+    $.get('domain.com/products', function(products) {
+      console.log(products);
+    })
+  }
+})
+```
+### Promise
+Callback을 사용하지 않고 Promise를 chaining하여 사용하면 코드의 흐름을 이해하기 쉬워진다.
+#### example 1
+```js
+function getId() {
+  return new Promise(function(resolve, reject) {
+    $.get('domain.com/id', function(id) {
+      resolve(id);
+    });
+  });
+}
+
+function getProducts() {
+  return new Promise(function(resolve, reject) {
+    $.get('domain.com/products', function(products) {
+      resolve(products);
+    });
+  });
+}
+
+function logProducts() {
+  // ...
+}
+
+// Promise Chaining
+getId()
+  .then(getProducts)
+  .then(logProducts)
+  .catch()
+```
+
+#### example 2
+```js
+function callAjax() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: 'https://api.hnpwa.com/v0/news/1.json',
+      success: function(data) {
+        resolve(data);
+      },
+    });
+  });
+}
+
+function fetchData() {
+  var result = [];
+  callAjax()
+    .then((res) => console.log(res));
+    .then((res) => console.log(res)); // Promise는 chaining이 가능하다.
+}
+```
+### async / await
+async / await은 JavaScript 비동기 처리 문법이다.
+[Callback](#callback)과 [Promise](#promise)의 단점을 해결하고, 동기적으로 코드를 작성할 수 있도록 해준다.
+
+#### 기본 문법
+함수 키워드 앞에 `async` 를 붙인다.
+비동기 처리 로직 앞에 `await` 을 붙인다. 단, `await`은 **Promise 객체를 반환**하는 함수 앞에 붙일 수 있다.
+
+```js
+async function fetchData() { // ㅎ마수 
+  await getUsers(); // await은 Promise 객체를 반환하는 함수 앞에 붙일 수 있다.
+}
+```
+#### example
+```js
+async function fetchData() {
+  const users = await getUsers();
+  console.log(users);
+}
+
+function getUsers() {
+  return new Promise(function(resolve, reject) {
+    const users = ['user1', 'user2', 'user3'];
+    resolve(users);
+  });
+}
+
+fetchData() // ['user1', 'user2', 'user3']
+```
+#### await 에러 핸들링
+```js
+async loginUser1() {
+  try {
+    const response = await axios.get('domain.com/id');
+    // ...
+  } catch (error) {
+    handleExeption(error); // 에러 핸들링 공통화
+    console.log(error);
+  }
+}
+```
+
+`utils/handler.js`
+```js
+export const handleException = (error) => {
+  // error status에 따라 로직 분리
+  throw new Error(error);
+};
+```
+## async / await store에 적용하기
+### Promise
+```js
+FETCH_LIST({ commit }, routeName) {
+  return fetchList(routeName)
+    .then(({ data }) => {
+      commit('SET_LIST', data);
+    })
+    .catch((err) => throw new Error(err));
+}
+```
+
+### async / await
+```js
+async FETCH_LIST({ commit }, routeName) {
+  const response = await fetchList(routeName);
+  commit('SET_LIST', response.data);
+  return response;
+}
+```
+
+## Error Handling
+에러 핸들링은 User와 가까워지는 로직 보다는 내부에서 실행되는 것이 좋다.
+
+`actions.js` 에서도 다음과 같이 `try catch` 를 할 수 있지만, api 로직인 `fetchUser`에서 할 수도 있다.
+```js
+async FETCH_USER({ commit }, userName) {
+  try {
+    const response = await fetchUser(userName);
+    commit('SET_USER', response.data);
+    return response;
+  } catch (error) {
+    handleException(error);
+    return error;
+  }
+},
+```
+
+```js
+// api/index.js
+const fetchUser = async (userName) => {
+  try {
+    return await axios.get(`${config.baseUrl}/user/${userName}.json`);
+  } catch (error) {
+    handleException(error);
+    return error;
+  }
+};
+
+// store/actions.js
+async FETCH_USER({ commit }, userName) {
+  const response = await fetchUser(userName);
+  commit('SET_USER', response.data);
+  return response;
+}
+```
 
 # Troubleshooting
 ## throw 사용 시 오류 발생
