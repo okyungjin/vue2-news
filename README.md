@@ -45,21 +45,39 @@
     - [async / await](#async--await-1)
   - [Error Handling](#error-handling)
   - [Vue에서 DOM에 접근하기 (ref 속성 사용)](#vue에서-dom에-접근하기-ref-속성-사용)
+  - [Plugins](#plugins)
+    - [Chart Plugin 생성](#chart-plugin-생성)
+    - [Chart Plugin 등록](#chart-plugin-등록)
+    - [Chart Plugin 사용](#chart-plugin-사용)
+  - [컴포넌트 디자인 패턴](#컴포넌트-디자인-패턴)
+  - [Slot](#slot)
+    - [Slot 사용](#slot-사용)
+    - [Slot 미사용](#slot-미사용)
+    - [그렇다면 왜 Slot을 사용하는가?](#그렇다면-왜-slot을-사용하는가)
+  - [props는 read-only로 사용한다](#props는-read-only로-사용한다)
+    - [잘못된 사용](#잘못된-사용)
+    - [수정 후](#수정-후)
+  - [render function](#render-function)
+    - [div 태그 이하에 서술](#div-태그-이하에-서술)
+    - [template에 서술](#template에-서술)
+    - [render function 사용](#render-function-사용)
+  - [slot-scope](#slot-scope)
+  - [서비스 배포하기](#서비스-배포하기)
+    - [build](#build)
+    - [netlify 이용하여 배포하기](#netlify-이용하여-배포하기)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
     - [오류](#오류)
     - [해결 방법](#해결-방법)
-  - [npm install 오류](#npm-install-오류)
-    - [vuex 설치 시 오류](#vuex-설치-시-오류)
-      - [오류](#오류-1)
-      - [해결 방법](#해결-방법-1)
-  - [ESLint 오류](#eslint-오류)
-    - [Prefer default export.(import/prefer-default-export)](#prefer-default-exportimportprefer-default-export)
-      - [오류](#오류-2)
-      - [해결 방법](#해결-방법-2)
-    - [Arrow function should not return assignment.(no-return-assign)](#arrow-function-should-not-return-assignmentno-return-assign)
-      - [오류](#오류-3)
-      - [해결 방법](#해결-방법-3)
+  - [npm i vuex 실행 시 오류](#npm-i-vuex-실행-시-오류)
+    - [오류](#오류-1)
+    - [해결 방법](#해결-방법-1)
+  - [[ESLint] Prefer default export.(import/prefer-default-export)](#eslint-prefer-default-exportimportprefer-default-export)
+    - [오류](#오류-2)
+    - [해결 방법](#해결-방법-2)
+  - [[ESLint] Arrow function should not return assignment.(no-return-assign)](#eslint-arrow-function-should-not-return-assignmentno-return-assign)
+    - [오류](#오류-3)
+    - [해결 방법](#해결-방법-3)
     
  
 <br>
@@ -533,6 +551,8 @@ async FETCH_USER({ commit }, userName) {
 
 **컴포넌트 단위로 존재하기 때문에 전역 tag로 접근하는  `getElementById`와 `querySelector` 보다는 `ref`를 사용하는 것이 좋다.**
 
+`ref`를 `app`으로 지정하면 `this.$refs.app` 과 같이 접근할 수 있다.
+
 ```html
 <html>
 <head>
@@ -551,7 +571,411 @@ async FETCH_USER({ commit }, userName) {
 </html>
 ```
 
+## Plugins
+### Chart Plugin 생성
+```js
+// src/plugins/chartPlugin.js
+import Chart from 'chart.js';
 
+export default {
+  install(Vue) {
+    Vue.prototype.$_Chart = Chart;
+  },
+};
+```
+
+### Chart Plugin 등록
+`Vue.use()`가 실행되면서 Plugin의 `install()`이 실행된다.
+```js
+// src/main.js
+import chartPlugin from './plugins/chartPlugin';
+
+Vue.use(chartPlugin);
+```
+### Chart Plugin 사용
+위와 같이 plugin을 등록하면 아래처럼 사용할 수 있다.
+이제 컴포넌트마다 `chart.js`를 import 하지 않아도 된다.
+```js
+// BarChart.vue
+this.$_Chart;
+
+// LineChart.vue
+this.$_Chart;
+```
+## 컴포넌트 디자인 패턴
+1. Common - 기본적인 컴포넌트 등록과 컴포넌트 통신
+2. Slot - 마크업 확장이 가능한 컴포넌트
+3. Controlled - 결합력이 높은 컴포넌트
+4. Renderless - 데이터 처리 컴포넌트
+
+## Slot
+Slot을 사용하면 마크업 확장이 가능하여, 유연한 컴포넌트를 생성할 수 있다.
+
+### Slot 사용
+다음은 Slot을 사용한 예시이다.
+
+`App.vue`
+```html
+<template>
+  <div>
+    <ul>
+      <item>아이템 1</item>
+      <item>아이템 2</item>ㄴ
+      <item>아이템 3</item>
+      <item>아이템 4</item>
+      <item>아이템 5</item>
+      <!-- <item>
+        아이템 2 <button>click me</button>
+      </item> -->
+    </ul>
+  </div>
+</template>
+
+<script>
+import Item from './Item.vue';
+
+export default {
+  components: {
+    Item,
+  },
+}
+</script>
+```
+
+`Item.vue`
+```html
+<template>
+  <li>
+    <slot>
+      <!-- NOTE: 등록하는 곳에서 정의할 화면 영역 -->
+    </slot>
+  </li>
+</template>
+```
+
+### Slot 미사용
+물론 Slot을 사용하지 않고 동일한 화면을 렌더링 할 수 있다.
+
+`App.vue`
+```html
+<template>
+  <div>
+    <ul>
+      <item v-for="item in items" :key="item"></item>
+      <item>아이템 1</item>
+      <item>아이템 2</item>
+      <item>아이템 3</item>
+      <item>아이템 4</item>
+      <item>아이템 5</item>
+    </ul>
+  </div>
+</template>
+
+<script>
+import Item from './Item.vue';
+
+export default {
+  components: {
+    Item,
+  },
+  data() {
+    return {
+      items: ['아이템1', '아이템2', '아이템3', '아이템4', '아이템5'],
+    }
+  }
+}
+</script>
+```
+
+`Item.vue`
+```html
+<template>
+  <div>
+    <ul>
+      <li v-for="item in items">
+        {{ item }}
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    items: {
+      type: Array,
+      required: true,
+    },
+  },
+}
+</script>
+```
+### 그렇다면 왜 Slot을 사용하는가?
+그렇다면 [Slot 미사용](#slot-미사용)처럼 구현하면 되는데, 왜 굳이 Slot을 사용하는 걸까?
+
+> Slot을 사용하면 요구사항 변경 등에 대해 유연하게 대응할 수 있다.
+
+Item에 버튼도 넣도록 요구사항이 추가되었다고 가정하자.
+[Slot 사용](#slot-사용) 구조로는 대응하기가 쉽지 않다.
+
+Slot을 사용했다면 다음과 같이 변경이 가능하다.
+
+`App.vue`
+```html
+<template>
+  <div>
+    <ul>
+      <item>아이템 1</item>
+      <item>아이템 2</item>
+      <item>아이템 3</item>
+      <item>아이템 4</item>
+      <item>
+        아이템 5 <button>click me</button>
+      </item>
+    </ul>
+  </div>
+</template>
+
+<script>
+import Item from './Item.vue';
+
+export default {
+  components: {
+    Item,
+  },
+}
+</script>
+```
+
+## props는 read-only로 사용한다
+### 잘못된 사용
+`App.vue`
+
+```html
+<template>
+  <check-box :checked="checked"></check-box>
+</template>
+
+<script>
+import CheckBox from './components/CheckBox.vue';
+
+export default {
+  components: {
+    CheckBox
+  },
+  data(){
+    return {
+      checked: true
+    }
+  }
+}
+</script>
+```
+
+`CheckBox.vue`
+
+```html
+<template>
+  <input type="checkbox" v-model="checked">
+</template>
+
+<script>
+export default {
+  props: ['checked'],
+}
+</script>
+```
+
+### 수정 후
+CheckBox의 데이터를 상위 컴포넌트인 App에서 관리하도록 변경한다.
+
+> **[잘못된 사용](#잘못된-사용)과의 차이점**
+> props를 CheckBox에서 변경하지 않고, 이벤트로 상위 컴포넌트에게 변경을 요청했기 때문이다.
+> CheckBox는 변경된 값을 다시 props로 받았기 때문에 오류가 발생하지 않는다.
+
+`App.vue`
+
+```html
+<template>
+  <check-box v-model:value="checked"></check-box>
+</template>
+
+<script>
+import CheckBox from './components/CheckBox.vue';
+
+export default {
+  components: {
+    CheckBox
+  },
+  data(){
+    return {
+      checked: true
+    }
+  }
+}
+</script>
+```
+
+`CheckBox.vue`
+
+```html
+<template>
+  <input type="checkbox" :value="value" @click="toggleCheckBox">
+</template>
+
+<script>
+export default {
+  // @input 이벤트
+  // :value 값
+  props: ['value'],
+  methods :{
+    toggleCheckBox(){
+      this.$emit('input', !this.value)
+    }
+  }
+}
+</script>
+```
+## render function
+### div 태그 이하에 서술 
+```html
+<html>
+<head>생략</head>
+<body>
+  <div id="app">
+    <p>{{ message }}</p>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue',
+      },
+    });
+  </script>
+</body>
+</html>
+```
+
+### template에 서술
+
+```html
+<html>
+<head>생략</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue',
+      },
+      template: '<p>{{ message }}</p>'
+    });
+  </script>
+</body>
+</html>
+```
+### render function 사용
+```html
+<html>
+<head>생략</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue',
+      },
+      render: function(createElement) {
+        return createElement('p', this.message);
+        // createElement('태그 이름', '태그 속성', '하위 태그 내용');
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+## slot-scope
+`App.vue`
+```html
+<template>
+  <div>
+    <fetch-data url="https://jsonplaceholder.typicode.com/users/1">
+      <!-- ... response, loading 을 가져올수 있다-->
+      <div v-slot="{response, loading}">
+        <div v-if="!loading">
+          <p>{{response.name}}</p>
+          <p>{{response.email}}</p>
+        </div>
+        <div v-if="loading">
+          loading...
+        </div>
+      </div>
+    </fetch-data>
+  </div>
+</template>
+
+<script>
+import FetchData from './components/FetchData.vue'
+
+export default {
+  components: {
+    FetchData
+  },
+}
+</script>
+```
+`FetchData.vue`
+
+```html
+<script>
+import axios from 'axios';
+
+export default {
+  props: ['url'],
+  data() {
+    return {
+      response: null,
+      loading: true,
+    }
+  },
+  created() {
+    axios.get(this.url)
+      .then(response => {
+        this.response = response.data;
+        this.loading = false;
+      })
+      .catch(error => {
+        alert('[ERROR] fetching the data', error);
+        console.log(error);
+      });
+  },
+  render() {
+    // 하위 컴포넌트에서 상위컴포넌트로 올린다 $scopedSlots
+    // slot -> v-slot // $scopedSlots.default -> $slots.default
+    return this.$scopedSlots.default({
+      response: this.response,
+      loading: this.loading,
+    });
+  },
+}
+</script>
+```
+
+## 서비스 배포하기
+### build
+`npm run build` 명령어를 실행하면 `dist` 하위에 호스팅할 수 있는 정적 파일이 생성된다.
+
+### netlify 이용하여 배포하기
+
+
+  
 # Troubleshooting
 ## throw 사용 시 오류 발생
 ### 오류
@@ -598,9 +1022,8 @@ module.exports = {
 ```
 3. `npm run serve` 재실행
 
-## npm install 오류
-### vuex 설치 시 오류
-#### 오류
+## npm i vuex 실행 시 오류
+### 오류
 `npm i vuex` 실행 시에 다음과 같은 오류가 발생한다.
 ```bash
 npm ERR! code ERESOLVE
@@ -625,19 +1048,17 @@ npm ERR! See /Users/kyungj/.npm/eresolve-report.txt for a full report.
 npm ERR! A complete log of this run can be found in:
 npm ERR!     /Users/kyungj/.npm/_logs/2022-03-30T02_20_25_758Z-debug-0.log
 ```
-#### 해결 방법
+### 해결 방법
 `npm i vuex` 로 설치할 경우 최신 버전이 설치되는데, 사용하고 있는 vue 버전이 2.x 라서 발생하는 오류이다. vuex 버전을 명시하여 설치해주면 해결된다.
 ```
 npm i vuex@3.6.2
 ```
-
-## ESLint 오류
-### Prefer default export.(import/prefer-default-export)
-#### 오류
+## [ESLint] Prefer default export.(import/prefer-default-export)
+### 오류
 ```
 ESLint: Prefer default export.(import/prefer-default-export)
 ```
-#### 해결 방법
+### 해결 방법
 `.eslintrc.js`에 rule 추가
 ```diff
 module.exports = {
@@ -647,14 +1068,14 @@ module.exports = {
 }
 ```
 
-### Arrow function should not return assignment.(no-return-assign)
-#### 오류
+## [ESLint] Arrow function should not return assignment.(no-return-assign)
+### 오류
 ```js
 fetchNewsList()
   .then((res) => this.users = res.data) // ERROR
   .catch((err) => throw new Error(err));
 ```
-#### 해결 방법
+### 해결 방법
 ```js
 fetchNewsList()
   .then((res) => { this.users = res.data; }) // braket으로 감싸기
