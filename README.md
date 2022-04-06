@@ -1,6 +1,7 @@
 # Table of Contents
 - [Table of Contents](#table-of-contents)
 - [About Project](#about-project)
+  - [소개](#소개)
 - [Project setup](#project-setup)
     - [Compiles and hot-reloads for development](#compiles-and-hot-reloads-for-development)
     - [Compiles and minifies for production](#compiles-and-minifies-for-production)
@@ -8,82 +9,41 @@
   - [ESLint 설정](#eslint-설정)
 - [DEV Notes](#dev-notes)
   - [Router 설정](#router-설정)
-    - [vue-router 설치](#vue-router-설치)
   - [Arrow function과 this](#arrow-function과-this)
-    - [Arrow function 사용](#arrow-function-사용)
-    - [Arrow Function 미사용](#arrow-function-미사용)
   - [export와 export default](#export와-export-default)
-    - [export](#export)
-    - [export default](#export-default)
   - [이벤트 버스(Event Bus)로 Spinner 제어하기](#이벤트-버스event-bus로-spinner-제어하기)
-    - [1) Event Bus 생성](#1-event-bus-생성)
-    - [2) Event Bus 등록](#2-event-bus-등록)
-    - [3) View에서 Event 발생시키기](#3-view에서-event-발생시키기)
   - [하이 오더 컴포넌트 (HOC, Higher-Order Components)](#하이-오더-컴포넌트-hoc-higher-order-components)
-    - [1) ListView 생성](#1-listview-생성)
-    - [2) createListView 함수 생성](#2-createlistview-함수-생성)
-    - [3) routes의 components 변경](#3-routes의-components-변경)
-    - [4) HOC 적용 확인](#4-hoc-적용-확인)
-      - [NewsView](#newsview)
-      - [JobsView](#jobsview)
-      - [AskView](#askview)
   - [Mixin](#mixin)
   - [Router 네비게이션 가드](#router-네비게이션-가드)
-    - [데이터 호출 시점](#데이터-호출-시점)
-    - [beforeEnter](#beforeenter)
   - [JavaScript 비동기 처리 패턴](#javascript-비동기-처리-패턴)
-    - [Callback](#callback)
-    - [Promise](#promise)
-      - [example 1](#example-1)
-      - [example 2](#example-2)
-    - [async / await](#async--await)
-      - [기본 문법](#기본-문법)
-      - [example](#example)
-      - [await 에러 핸들링](#await-에러-핸들링)
   - [async / await store에 적용하기](#async--await-store에-적용하기)
-    - [Promise](#promise-1)
-    - [async / await](#async--await-1)
   - [Error Handling](#error-handling)
   - [Vue에서 DOM에 접근하기 (ref 속성 사용)](#vue에서-dom에-접근하기-ref-속성-사용)
   - [Plugins](#plugins)
-    - [Chart Plugin 생성](#chart-plugin-생성)
-    - [Chart Plugin 등록](#chart-plugin-등록)
-    - [Chart Plugin 사용](#chart-plugin-사용)
   - [컴포넌트 디자인 패턴](#컴포넌트-디자인-패턴)
   - [Slot](#slot)
-    - [Slot 사용](#slot-사용)
-    - [Slot 미사용](#slot-미사용)
-    - [그렇다면 왜 Slot을 사용하는가?](#그렇다면-왜-slot을-사용하는가)
   - [props는 read-only로 사용한다](#props는-read-only로-사용한다)
-    - [잘못된 사용](#잘못된-사용)
-    - [수정 후](#수정-후)
   - [render function](#render-function)
-    - [div 태그 이하에 서술](#div-태그-이하에-서술)
-    - [template에 서술](#template에-서술)
-    - [render function 사용](#render-function-사용)
   - [slot-scope](#slot-scope)
   - [서비스 배포하기](#서비스-배포하기)
-    - [build](#build)
-    - [netlify 이용하여 배포하기](#netlify-이용하여-배포하기)
 - [Troubleshooting](#troubleshooting)
   - [throw 사용 시 오류 발생](#throw-사용-시-오류-발생)
-    - [오류](#오류)
-    - [해결 방법](#해결-방법)
   - [npm i vuex 실행 시 오류](#npm-i-vuex-실행-시-오류)
-    - [오류](#오류-1)
-    - [해결 방법](#해결-방법-1)
   - [[ESLint] Prefer default export.(import/prefer-default-export)](#eslint-prefer-default-exportimportprefer-default-export)
-    - [오류](#오류-2)
-    - [해결 방법](#해결-방법-2)
-  - [[ESLint] Arrow function should not return assignment.(no-return-assign)](#eslint-arrow-function-should-not-return-assignmentno-return-assign)
-    - [오류](#오류-3)
-    - [해결 방법](#해결-방법-3)
-    
+  - [[ESLint] Arrow function should not return assignment.(no-return-assign)](#eslint-arrow-function-should-not-return-assignmentno-return-assign)     
  
 <br>
 
 # About Project
+https://enchanting-choux-71d4fb.netlify.app/
+![vue2-news](https://user-images.githubusercontent.com/31913666/161882269-5c5981c6-fe91-457e-8ae6-b724bfc868db.gif)
 
+## 소개
+- News / Ask / Jobs 탭으로 각 화면으로 이동할 수 있습니다.
+- News 탭의 화면에서는 News가 보여지며, 제목을 클릭하면 해당 뉴스 페이지로 이동합니다.
+- Ask 탭의 화면에서는 사용자가 올린 질문들이 보여지며, 제목을 클릭하면 해당 질문으로 이동합니다.
+- Jobs 탭의 화면에서는 구직 정보가 보여지며, 제목을 클릭하면 해당 구직 정보 페이지로 이동합니다.
+- User의 이름을 클릭하면 유저의 정보를 볼 수 있는 페이지로 이동합니다.
 # Project setup
 ```
 npm install
@@ -973,8 +933,20 @@ export default {
 `npm run build` 명령어를 실행하면 `dist` 하위에 호스팅할 수 있는 정적 파일이 생성된다.
 
 ### netlify 이용하여 배포하기
+[netlify](https://www.netlify.com/)를 사용하면 쉽게 호스팅할 수 있다.
+GitHub 계정을 연동하여 repo와 branch를 지정하면, 해당 branch에 소스가 push 될 때마다 배포가 자동으로 진행된다.
 
+netlify로 배포를 진행하면 네비게이션을 사용했을 때는 라우팅이 잘 되지만, `/ask`, `news` 처럼 주소를 직접 입력하였을 때는 404 Page가 표시된다.
+이는 서버에서 `ask`의 주소가 AskView 임을 인지하지 못하여 발생하는 이슈이다.
 
+따라서, netlify로 SPA를 호스팅할 때 다음과 같은 설정을 해주어야 한다.
+root에 `netlify.toml`을 생성하고 다음 소스를 적어준다.
+```
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
   
 # Troubleshooting
 ## throw 사용 시 오류 발생
